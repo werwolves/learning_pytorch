@@ -1,9 +1,12 @@
-import faiss
+import faiss, os
 import numpy as np
-
+import cv2
+from PIL import Image
 
 class OP_FAISS:
-    def __init__(self, vector_dim=64, index_type='Flat', metric_type=faiss.METRIC_INNER_PRODUCT, test_mode=True):
+    def __init__(self, vector_dim=64, index_type='Flat', 
+                 data_vector_func = None,
+                 metric_type=faiss.METRIC_INNER_PRODUCT, test_mode=True):
         """_summary_
         Args:
             vector_dim:  向量维度
@@ -19,11 +22,37 @@ class OP_FAISS:
         # self.test_model = test_mode
         self.vector_db = None
         self.vector_query = None
+        self.data_vector_func = data_vector_func # 该函数需要外部写好后，传入此处
+        self.support_img_format = [".jpg", ".png"]
         print(f'test_mode:{test_mode}')
         if test_mode:
             print("正处在测试模式下。。。。。。。==")
             self.prepare_vector_db()
-            self.build_vector_db_index()
+        self.build_vector_db_index()
+        
+    def create_real_vector_db(self, data_dir):   
+        for i in data_dir:
+            # "1", '.jpg' = os.path.splitext('1.jpg')
+            raw_file_name, extension_name = os.path.splitext(i)
+            if extension_name in self.support_img_format:
+                full_img_path = os.path.join(data_dir,i)
+                vector = self.data_vector_func(full_img_path)
+    def preprocess_image(self, img_path):
+        """
+            书写 图像处理的逻辑
+        """
+        cv_img = cv2.imread(img_path)
+        return cv_img
+    
+    def create_real_vector_db2(self, data_dir):
+        import torch
+        from torchvision.models import resnet50
+        # 加载预训练模型
+        model = resnet50(pretrained=True)
+        model.fc = torch.nn.Identity()  # 该层直接
+        
+        
+        
         
         
     def prepare_vector_db(self, vector_db_num=1000, query_vector_num=100):
