@@ -7,3 +7,5 @@ data_batch_*
 /pytorch_basics/data
 *.pkl
 RNN的用法/data/MNIST/raw
+*.pyc
+*.index
