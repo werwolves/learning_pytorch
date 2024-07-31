@@ -1,4 +1,4 @@
-import faiss, os
+import faiss, os, json
 import numpy as np
 import cv2
 from PIL import Image
@@ -7,14 +7,15 @@ from abc import ABC, abstractmethod
 
 class OP_FAISS(ABC):
     def __init__(self, vector_dim=64, index_type='Flat', 
-                 data_vector_func = None,
                  data_dir = None,
-                 metric_type=faiss.METRIC_INNER_PRODUCT, test_mode=True):
+                 metric_type=faiss.METRIC_L2, test_mode=True):
         """_summary_
         Args:
             vector_dim:  向量维度
             metric_type: 向量度量类型
             index_type:  index 类型
+                         'Flat': 暴力精确检索，全局最优，适合数十万级。
+            
             data_dir:    图像对应文件夹的路径
             metric_type: 是否是测试模型， True: 使用人造向量数据
                                         False: 使用真实场景中的向量数据
@@ -47,13 +48,20 @@ class OP_FAISS(ABC):
     def create_real_vector_db(self):   
         model = self.data_vector_func()
         feat_l = []
-        for i in os.listdir(self.data_dir):
+        label_d = {}
+        # 假设图像的标签值 全部都为 '1'
+        img_paths_l, labels = os.listdir(self.data_dir), len(os.listdir(self.data_dir)) * ['1']
+        for img_no, i in enumerate(img_paths_l):
             img_path = os.path.join(self.data_dir, i)
             img = cv2.imread(img_path)
+            label_d[i] = labels[img_no]
             # 还可以对图像做一些其他的处理，eg：resize等
             feat =  model(img.unqueeze(0)).squeeze().numpy()
             feat_l.append(feat)
+        # ----------------------------------------******** self.vector_db 就是存在数据库中的向量 *******-------------------
         self.vector_db = np.stack(feat_l)
+        with open('label.json','w') as f:
+            json.dump(label_d, f)
 
 
         
