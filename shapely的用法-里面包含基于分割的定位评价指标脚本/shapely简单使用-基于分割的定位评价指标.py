@@ -30,25 +30,25 @@ class DetectionIoUEvaluator(object):
         def get_intersection(pD, pG):
             return Polygon(pD).intersection(Polygon(pG)).area
 
-        def compute_ap(confList, matchList, numGtCare):
-            correct = 0
-            AP = 0
-            if len(confList) > 0:
-                confList = np.array(confList)
-                matchList = np.array(matchList)
-                sorted_ind = np.argsort(-confList)
-                confList = confList[sorted_ind]
-                matchList = matchList[sorted_ind]
-                for n in range(len(confList)):
-                    match = matchList[n]
-                    if match:
-                        correct += 1
-                        AP += float(correct) / (n + 1)
+        # def compute_ap(confList, matchList, numGtCare):
+        #     correct = 0
+        #     AP = 0
+        #     if len(confList) > 0:
+        #         confList = np.array(confList)
+        #         matchList = np.array(matchList)
+        #         sorted_ind = np.argsort(-confList)
+        #         confList = confList[sorted_ind]
+        #         matchList = matchList[sorted_ind]
+        #         for n in range(len(confList)):
+        #             match = matchList[n]
+        #             if match:
+        #                 correct += 1
+        #                 AP += float(correct) / (n + 1)
 
-                if numGtCare > 0:
-                    AP /= numGtCare
+        #         if numGtCare > 0:
+        #             AP /= numGtCare
 
-            return AP
+        #     return AP
 
         perSampleMetrics = {}
 
@@ -104,7 +104,9 @@ class DetectionIoUEvaluator(object):
         evaluationLog += "GT polygons: " + str(len(gtPols)) + (
             " (" + str(len(gtDontCarePolsNum)) + " don't care)\n"
             if len(gtDontCarePolsNum) > 0 else "\n")
-
+        """
+        1.  统计下 检测框中 需要被忽略的的检测框的 index位置 存放在 detDontCarePolsNum 中
+        """
         for n in range(len(pred)):     # 遍历 每一个预测框
             points = pred[n]['points']
             if not Polygon(points).is_valid:
@@ -127,18 +129,24 @@ class DetectionIoUEvaluator(object):
             " (" + str(len(detDontCarePolsNum)) + " don't care)\n"
             if len(detDontCarePolsNum) > 0 else "\n")
         # ---------------------------------------------------- 以下才是关键的核心代码 --------------------------------------------------------- # 
+
         if len(gtPols) > 0 and len(detPols) > 0:
             # Calculate IoU and precision matrixs
             outputShape = [len(gtPols), len(detPols)]  # [2, 1] ----> 表示 gt-box 的数量是2， det-box的数量为1
             iouMat = np.empty(outputShape)
             gtRectMat = np.zeros(len(gtPols), np.int8)   # array([0, 0], dtype=int8)
             detRectMat = np.zeros(len(detPols), np.int8) # array([0], dtype=int8)
+            """
+            1. 计算 gt-box 与 det-box 两两之间 IoU 
+            """
             for gtNum in range(len(gtPols)):
                 for detNum in range(len(detPols)):
                     pG = gtPols[gtNum]
                     pD = detPols[detNum]
                     iouMat[gtNum, detNum] = get_intersection_over_union(pD, pG)  # 计算所有的 gt-box 与 所有的 det-box 之间  IoU
-
+            """
+            1. 统计出所有的匹配上的 gt-box 与 det-box 的 index位置
+            """
             for gtNum in range(len(gtPols)):
                 for detNum in range(len(detPols)):
                     if gtRectMat[gtNum] == 0 and detRectMat[
@@ -203,7 +211,7 @@ class DetectionIoUEvaluator(object):
 if __name__ == '__main__':
     evaluator = DetectionIoUEvaluator()
     gt_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-gt'
-    pred_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-pred'
+    pred_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-pred-2025-3-4'
     
     gts,preds = [],[]
     for i in os.listdir(gt_dir):
