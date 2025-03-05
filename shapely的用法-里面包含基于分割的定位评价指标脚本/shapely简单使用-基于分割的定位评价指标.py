@@ -181,6 +181,9 @@ class DetectionIoUEvaluator(object):
             'detCare': numDetCare,
             'detMatched': detMatched,
         }
+        
+        print(perSampleMetrics)
+        print('='*50)
         return perSampleMetrics
 
     def combine_results(self, results):
@@ -210,12 +213,17 @@ class DetectionIoUEvaluator(object):
 
 if __name__ == '__main__':
     evaluator = DetectionIoUEvaluator()
-    gt_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-gt'
-    pred_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-pred-2025-3-4'
+    # gt_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-gt'
+    # pred_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-pred-2025-3-4'
+    
+    gt_dir = r'E:\RFID\datasets\cj_loc\sh_east_lib\test-gt'
+    pred_dir = r'E:\RFID\datasets\cj_loc\sh_east_lib\test-pred-2025-3-5'
     
     gts,preds = [],[]
+    sample_name_list = []
     for i in os.listdir(gt_dir):
         if i.endswith('.json'):
+            sample_name_list.append(i)
             gt_path = os.path.join(gt_dir,i)
             pred_path = os.path.join(pred_dir,i)
             with open(gt_path,'r', encoding='utf-8') as f:
@@ -243,7 +251,8 @@ if __name__ == '__main__':
     
 
     results = []
-    for gt, pred in zip(gts, preds):
+    for index, (gt, pred) in enumerate(zip(gts, preds)):
+        print(f"Processing {sample_name_list[index]}")
         results.append(evaluator.evaluate_image(gt, pred))
     metrics = evaluator.combine_results(results)
     print(metrics)
