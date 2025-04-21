@@ -213,11 +213,19 @@ class DetectionIoUEvaluator(object):
 
 if __name__ == '__main__':
     evaluator = DetectionIoUEvaluator()
-    gt_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-gt'
-    pred_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-pred-2025-3-4'
+    # gt_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-gt'
+    # gt_dir = r"E:\RFID\datasets\pictures3\pictures3\pictures_CJ_bookspine_cut_choice_mark_task_package\testdatasets"
+    # pred_dir = r'E:\RFID\datasets\book_loc\sh_east_lib\test\test-pred-2025-3-4'
     
     # gt_dir = r'E:\RFID\datasets\cj_loc\sh_east_lib\test-gt'
     # pred_dir = r'E:\RFID\datasets\cj_loc\sh_east_lib\test-pred-2025-3-5'
+    
+    # 本次训练的
+    gt_dir = r'E:\RFID\datasets\pictures3\pictures3\pictures_CJ_bookspine_cut_choice_mark_task_package\testdatasets'
+    # pred_dir = r'D:\projects\RFID\OCR\paddleocr-det-use-onnx\draw_img_save_dir_text_loc_2025-4-18'
+    # {'precision': 0.8216520650813517, 'recall': 0.7981762917933131, 'hmean': 0.8097440641381437}
+    pred_dir = r"D:\projects\RFID\OCR\paddleocr-det-use-onnx\draw_img_save_dir_text_loc_2025-4-18-paddleocr"
+    # {'precision': 0.8116308470290771, 'recall': 0.780547112462006, 'hmean': 0.7957855593430432}
     
     gts,preds = [],[]
     sample_name_list = []
@@ -235,7 +243,7 @@ if __name__ == '__main__':
             for gt_info in gt_data['shapes']:
                 box_dict = {}
                 box_dict["points"] = gt_info["points"]
-                box_dict["text"] = gt_info["label"]
+                box_dict["text"] = "text" #gt_info["label"]
                 box_dict["ignore"] = False
                 new_sample_gt.append(box_dict)
             gts.append(new_sample_gt)
@@ -243,7 +251,7 @@ if __name__ == '__main__':
             for pred_info in pred_data['shapes']:
                 box_dict = {}
                 box_dict["points"] = pred_info["points"]
-                box_dict["text"] = pred_info["label"]
+                box_dict["text"] = "text" # pred_info["label"]
                 box_dict["ignore"] = False
                 new_sample_pred.append(box_dict)
             preds.append(new_sample_pred)   
