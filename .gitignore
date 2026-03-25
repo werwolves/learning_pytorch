@@ -1,4 +1,4 @@
-/tensorboard-log
+/tensorboard-log*
 /log
 logistic_regression/data
 *.ckpt
