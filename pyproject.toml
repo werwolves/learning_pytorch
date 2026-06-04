@@ -5,12 +5,14 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "datasets>=4.8.5",
     "ipykernel>=7.2.0",
     "numpy>=2.4.3",
-    "pkg-resources",
+    "opencv-python>=4.13.0.92",
     "setuptools>=82.0.1",
     "torch",
     "torchvision",
+    "transformers>=5.10.1",
 ]
 
 [[tool.uv.index]]
