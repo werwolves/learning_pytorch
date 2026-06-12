@@ -9,3 +9,7 @@ data_batch_*
 RNN的用法/data/MNIST/raw
 *.pyc
 *.index
+
+模型尝鲜/*
+!模型尝鲜/*.py
+!模型尝鲜/*.ipynb
